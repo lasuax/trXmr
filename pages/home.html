@@ -1,0 +1,624 @@
+<style>
+    .marketFooter {
+        font-size: 10px;
+        opacity: 0.6;
+    }
+
+    #networkLastReward {
+        text-transform: uppercase;
+    }
+
+    #lastHash {
+        font-family: 'Inconsolata', monospace;
+        font-size: 0.8em;
+    }
+
+    #poolDonations {
+        font-size: 0.75em;
+    }
+
+    #miningProfitCalc {
+        margin: 35px 0;
+    }
+
+    #calcHashDropdown {
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    #calcHashHolder {
+        width: 590px;
+        max-width: 100%;
+    }
+
+    #calcHashRate {
+        z-index: inherit;
+        font-family: 'Inconsolata', monospace;
+    }
+
+    #calcHashAmount {
+        font-family: 'Inconsolata', monospace;
+    }
+
+    #calcHashResultsHolder {
+        min-width: 145px;
+        max-width: 145px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #yourStatsInput {
+        z-index: inherit;
+        font-family: 'Inconsolata', monospace;
+    }
+
+    #yourAddressDisplay>span {
+        font-family: 'Inconsolata', monospace;
+    }
+
+    #lookUp>span:nth-child(2) {
+        display: none;
+    }
+
+    .yourStats {
+        display: none;
+    }
+
+    #yourAddressDisplay {
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+        font-family: 'Inconsolata', monospace;
+        font-size: 0.9em;
+    }
+
+    #addressError {
+        color: red;
+    }
+
+
+    #payments_rows>tr>td {
+        vertical-align: middle;
+        font-family: 'Inconsolata', monospace;
+        font-size: 0.95em;
+        text-align: center;
+    }
+
+    #payments_rows>tr>td:nth-child(2) {
+        text-align: left;
+    }
+</style>
+
+
+<div class="container text-center">
+    <a class="btn btn-primary btn-lg" data-toggle="modal" data-target="#videoModal" data-theVideo="https://www.youtube.com/embed/vDnLUPDUoUY"
+        role="button">Monero Nedir?</a>
+</div>
+
+<div class="row">
+    <div class="col-md-4 stats">
+        <h3>Havuz</h3>
+        <div>
+            <i class="fas fa-tachometer-alt"></i> Hash Oranı:
+            <span id="poolHashrate"></span>
+        </div>
+        <div>
+            <i class="fas fa-clock"></i> Bulunan Blok:
+            <span id="poolLastBlockFound"></span>
+        </div>
+        <div>
+            <i class="fa fa-users"></i>Bağlı Kazıcı:
+            <span id="poolMiners"></span>
+        </div>
+        <div>
+            <i class="fa fa-gift"></i> Bağış:
+            <span id="poolDonations"></span>
+        </div>
+        <div>
+            <i class="fab fa-monero"></i> Havuz Ücr.:
+            <span id="poolFee"></span>
+        </div>
+        <div>
+            <i class="fa fa-history"></i> Blok Bulma Sıklığı:
+            <span id="blockSolvedTime"></span> (ort.)</div>
+    </div>
+
+    <div class="col-md-4 stats">
+        <h3>Ağ</h3>
+        <div>
+            <i class="fas fa-tachometer-alt"></i> Hash Oranı:
+            <span id="networkHashrate"></span>
+        </div>
+        <div>
+            <i class="fas fa-clock"></i> Bulunan Blok:
+            <span id="networkLastBlockFound"></span>
+        </div>
+        <div>
+            <i class="fa fa-unlock-alt"></i> Zorluk:
+            <span id="networkDifficulty"></span>
+        </div>
+        <div>
+            <i class="fa fa-bars"></i> Blockchain Uzunluğu:
+            <span id="blockchainHeight"></span>
+        </div>
+        <div>
+            <i class="fab fa-monero"></i> Son Ödül:
+            <span id="networkLastReward"></span>
+        </div>
+        <div>
+            <i class="fa fa-paw"></i> Son Hash:
+            <a id="lastHash" target="_blank"></a>
+        </div>
+    </div>
+
+    <div class="col-md-4 stats">
+        <h3 id="marketHeader">Market</h3>
+        <div class="marketFooter">Güncelleme:
+            <span id="marketLastUpdated"></span>
+        </div>
+        <div class="marketFooter">API:
+            <a href="https://coinmarketcap.com/" target="_blank">CoinMarketCap</a>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div id="miningProfitCalc">
+    <h3>Kazıcı Kazancı Hesaplama</h3>
+    <div id="calcHashHolder">
+        <div class="input-group">
+            <input type="number" class="form-control" id="calcHashRate" placeholder="Hash oranını gir">
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="calcHashDropdown">
+                    <span id="calcHashUnit" data-mul="1">KH/s</span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" role="menu" id="calcHashUnits">
+                    <li>
+                        <a href="#" data-mul="0">H/s</a>
+                    </li>
+                    <li>
+                        <a href="#" data-mul="1">KH/s</a>
+                    </li>
+                    <li>
+                        <a href="#" data-mul="2">MH/s</a>
+                    </li>
+                </ul>
+            </div>
+            <span class="input-group-addon">=</span>
+            <span class="input-group-addon" id="calcHashResultsHolder">
+                <span id="calcHashAmount"></span>
+                <span id="calcHashSymbol"></span>/gün</span>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="stats">
+    <h3>Senin İstatistiklerin & Ödeme Geçmişin</h3>
+
+    <div class="input-group">
+        <input class="form-control" id="yourStatsInput" type="text" placeholder="Cüzdan adresini gir">
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="lookUp">
+                <span>
+                    <i class="fa fa-search"></i> Gözat</span>
+                <span>
+                    <i class="fa fa-refresh fa-spin"></i> Arıyor...</span>
+            </button>
+        </span>
+    </div>
+
+    <div id="addressError"></div>
+    <div class="yourStats">
+        <i class="fa fa-key"></i> Adres:
+        <span id="yourAddressDisplay"></span>
+    </div>
+    <div class="yourStats">
+        <i class="fa fa-bank"></i> Bekleyen Ödeme:
+        <span id="yourPendingBalance"></span>
+    </div>
+    <div class="yourStats">
+        <i class="fa fa-money"></i> Toplam Ödenen:
+        <span id="yourPaid"></span>
+    </div>
+    <div class="yourStats">
+        <i class="fa fa-clock-o"></i> Yapılan Son Paylaşım:
+        <span id="yourLastShare"></span>
+    </div>
+    <div class="yourStats">
+        <i class="fa fa-tachometer"></i> Hash Oranı:
+        <span id="yourHashrateHolder"></span>
+    </div>
+    <div class="yourStats">
+        <i class="fa fa-cloud-upload"></i> Toplam Gönderilen Paylaşım:
+        <span id="yourHashes"></span>
+    </div>
+
+    <br class="yourStats">
+
+    <h4 class="yourStats">Ödemeler</h4>
+    <div class="yourStats table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        <i class="fa fa-clock-o"></i> Gönderilme Tarihi</th>
+                    <th>
+                        <i class="fa fa-paw"></i> Gönderim Hash</th>
+                    <th>
+                        <i class="fa fa-money"></i> Tutar</th>
+                    <th>
+                        <i class="fa fa-sitemap"></i> Mixin</th>
+                </tr>
+            </thead>
+            <tbody id="payments_rows">
+
+            </tbody>
+        </table>
+    </div>
+    <p class="yourStats text-center">
+        <button type="button" class="btn btn-default" id="loadMorePayments">Daha Fazla</button>
+    </p>
+
+</div>
+<div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div>
+                    <iframe width="100%" height="350" src=""></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    currentPage = {
+        destroy: function () {
+            $('#networkLastBlockFound,#poolLastBlockFound,#yourLastShare,#marketLastUpdated').timeago('dispose');
+            if (xhrAddressPoll) xhrAddressPoll.abort();
+            if (addressTimeout) clearTimeout(addressTimeout);
+            clearInterval(intervalMarketPolling);
+            for (var marketPoll in xhrMarketGets) {
+                xhrMarketGets[marketPoll].abort();
+            }
+            if (xhrGetPayments) xhrGetPayments.abort();
+        },
+        update: function () {
+
+            $('#networkLastBlockFound').timeago('update', new Date(lastStats.network.timestamp * 1000).toISOString());
+
+            updateText('networkHashrate', getReadableHashRateString(lastStats.network.difficulty / 120) +
+                '/sec');
+            updateText('networkDifficulty', lastStats.network.difficulty.toString());
+            updateText('blockchainHeight', lastStats.network.height.toString());
+            updateText('networkLastReward', getReadableCoins(lastStats.network.reward, 4));
+            updateText('lastHash', lastStats.network.hash.substr(0, 13) + '...').setAttribute('href',
+                blockchainExplorer + lastStats.network.hash
+            );
+
+            updateText('poolHashrate', getReadableHashRateString(lastStats.pool.hashrate) + '/sec');
+
+            if (lastStats.pool.lastBlockFound) {
+                var d = new Date(parseInt(lastStats.pool.lastBlockFound)).toISOString();
+                $('#poolLastBlockFound').timeago('update', d);
+            } else
+                $('#poolLastBlockFound').removeAttr('title').data('ts', '').update('Hiçbir zaman');
+
+            //updateText('poolRoundHashes', lastStats.pool.roundHashes.toString());
+            updateText('poolMiners', lastStats.pool.miners.toString());
+
+
+            var totalFee = lastStats.config.fee;
+            if (lastStats.config.doDonations) {
+                totalFee += lastStats.config.donation;
+                totalFee += lastStats.config.coreDonation;
+                var feeText = [];
+                if (lastStats.config.donation > 0) feeText.push(lastStats.config.donation + '% to pool dev');
+                if (lastStats.config.coreDonation > 0) feeText.push(lastStats.config.coreDonation +
+                    '% to core devs');
+                updateText('poolDonations', feeText.join(', '));
+            } else {
+                updateText('poolDonations', '');
+            }
+
+            updateText('poolFee', totalFee + '%');
+
+
+            updateText('blockSolvedTime', getReadableTime(lastStats.network.difficulty / lastStats.pool.hashrate));
+            updateText('calcHashSymbol', lastStats.config.symbol);
+
+            calcEstimateProfit();
+        }
+    };
+
+
+    $('#networkLastBlockFound,#poolLastBlockFound,#yourLastShare,#marketLastUpdated').timeago();
+
+
+    function getReadableTime(seconds) {
+
+        var units = [
+            [60, 'saniye'],
+            [60, 'dakika'],
+            [24, 'saat'],
+            [7, 'gün'],
+            [4, 'hafta'],
+            [12, 'ay'],
+            [1, 'yıl']
+        ];
+
+        function formatAmounts(amount, unit) {
+            var rounded = Math.round(amount);
+            return (rounded + ' ' + unit);
+        }
+
+        var amount = seconds;
+        for (var i = 0; i < units.length; i++) {
+            if (amount < units[i][0])
+                return formatAmounts(amount, units[i][1]);
+            amount = amount / units[i][0];
+        }
+        return formatAmounts(amount, units[units.length - 1][1]);
+    }
+
+    function getReadableHashRateString(hashrate) {
+        var i = 0;
+        var byteUnits = [' H', ' KH', ' MH', ' GH', ' TH', ' PH'];
+        while (hashrate > 1000) {
+            hashrate = hashrate / 1000;
+            i++;
+        }
+        return hashrate.toFixed(2) + byteUnits[i];
+    }
+
+
+
+
+    /* Market data polling */
+    // Bu interval bazen çalışmıyor. Haberimiz var :)
+    var intervalMarketPolling = setInterval(updateMarkets, 180000); //poll market data every 3 minutes
+    var xhrMarketGets = {};
+    updateMarkets();
+
+    function updateMarkets() {
+        var marketsData = [];
+
+        $.get('https://api.coinmarketcap.com/v1/ticker/monero/?convert=TRY', function (data) {
+            marketsData[0] = data;
+
+            var $marketHeader = $('#marketHeader');
+            $('.marketTicker').remove();
+
+            var price = parseFloat(marketsData[0][0].price_usd);
+
+            if (price > 1) price = Math.round(price * 100) / 100;
+            else price = marketsData[0][0].price_usd;
+
+            $marketHeader.after('<div class="marketTicker">' + '<i class="fab fa-monero"></i>' + ' <span>' +
+                price + ' <i class="fas fa-dollar-sign"></i> ' + '</span></div>');
+
+            var price = parseFloat(marketsData[0][0].price_btc);
+
+            if (price > 1) price = Math.round(price * 100) / 100;
+            else price = marketsData[0][0].price_btc;
+
+            $marketHeader.after('<div class="marketTicker">' + '<i class="fab fa-monero"></i>' + ' <span>' +
+                price + ' <i class="fab fa-btc"></i> ' + '</span></div>');
+
+            var price = parseFloat(marketsData[0][0].price_try);
+
+            if (price > 1) price = Math.round(price * 100) / 100;
+            else price = marketsData[0][0].price_try;
+
+            $marketHeader.after('<div class="marketTicker">' + '<i class="fab fa-monero"></i>' + ' <span>' +
+                price + ' <i class="fas fa-lira-sign"></i> ' + '</span></div>');
+            $('#marketLastUpdated').timeago('update', new Date(marketsData[0][0].last_updated * 1000).toISOString());
+        }, 'json');
+    }
+
+    // REQUIRED: "jQuery Query Parser" plugin.
+    // https://github.com/mattsnider/jquery-plugin-query-parser
+    // Minified version here:
+    (function ($) {
+        var pl = /\+/g,
+            searchStrict = /([^&=]+)=+([^&]*)/g,
+            searchTolerant = /([^&=]+)=?([^&]*)/g,
+            decode = function (s) {
+                return decodeURIComponent(s.replace(pl, " "));
+            };
+        $.parseQuery = function (query, options) {
+            var match, o = {},
+                opts = options || {},
+                search = opts.tolerant ? searchTolerant : searchStrict;
+            if ('?' === query.substring(0, 1)) {
+                query = query.substring(1);
+            }
+            while (match = search.exec(query)) {
+                o[decode(match[1])] = decode(match[2]);
+            }
+            return o;
+        };
+        $.getQuery = function (options) {
+            return $.parseQuery(window.location.search, options);
+        };
+        $.fn.parseQuery = function (options) {
+            return $.parseQuery($(this).serialize(), options);
+        };
+    }(jQuery));
+
+    /* Hash Profitability Calculator */
+
+    $('#calcHashRate').keyup(calcEstimateProfit).change(calcEstimateProfit);
+
+    $('#calcHashUnits > li > a').click(function (e) {
+        e.preventDefault();
+        $('#calcHashUnit').text($(this).text()).data('mul', $(this).data('mul'));
+        calcEstimateProfit();
+    });
+
+    function calcEstimateProfit() {
+        try {
+            var rateUnit = Math.pow(1000, parseInt($('#calcHashUnit').data('mul')));
+            var inp2 = parseFloat($('#calcHashRate').val()) * rateUnit;
+            var resl = (lastStats.network.reward / coinUnits) / ((lastStats.network.difficulty / inp2) / 86400);
+            if (!isNaN(resl)) {
+                updateText('calcHashAmount', (Math.round(resl * 100) / 100).toString());
+                return;
+            }
+        } catch (e) {}
+        updateText('calcHashAmount', '');
+    }
+
+
+
+
+
+    /* Stats by mining address lookup */
+
+    function getPaymentCells(payment) {
+        return '<td>' + formatDate(payment.time) + '</td>' +
+            '<td>' + formatPaymentLink(payment.hash) + '</td>' +
+            '<td>' + getReadableCoins(payment.amount, 4, true) + '</td>' +
+            '<td>' + payment.mixin + '</td>';
+    }
+
+    var xhrAddressPoll;
+    var addressTimeout;
+
+    $('#lookUp').click(function () {
+
+        var address = $('#yourStatsInput').val().trim();
+        if (!address) {
+            $('#yourStatsInput').focus();
+            return;
+        }
+
+        $('#addressError').hide();
+        $('.yourStats').hide();
+        $('#payments_rows').empty();
+
+        $('#lookUp > span:first-child').hide();
+        $('#lookUp > span:last-child').show();
+
+
+        if (xhrAddressPoll) xhrAddressPoll.abort();
+        if (addressTimeout) clearTimeout(addressTimeout);
+
+        function fetchAddressStats(longpoll) {
+            xhrAddressPoll = $.ajax({
+                url: api + '/stats_address',
+                data: {
+                    address: address,
+                    longpoll: longpoll
+                },
+                dataType: 'json',
+                cache: 'false',
+                success: function (data) {
+
+                    $('#lookUp > span:last-child').hide();
+                    $('#lookUp > span:first-child').show();
+
+                    if (!data.stats) {
+                        $('.yourStats').hide();
+                        $('#addressError').text(data.error).show();
+
+                        if (addressTimeout) clearTimeout(addressTimeout);
+                        addressTimeout = setTimeout(function () {
+                            fetchAddressStats(false);
+                        }, 2000);
+
+                        return;
+                    }
+
+
+                    $('#addressError').hide();
+                    updateText('yourAddressDisplay', address);
+
+                    if (data.stats.lastShare)
+                        $('#yourLastShare').timeago('update', new Date(parseInt(data.stats.lastShare) *
+                            1000).toISOString());
+                    else
+                        updateText('yourLastShare', 'Hiçbir zaman');
+
+                    updateText('yourHashrateHolder', (data.stats.hashrate || '0 H') + '/sec');
+                    updateText('yourHashes', (data.stats.hashes || 0).toString());
+                    updateText('yourPaid', getReadableCoins(data.stats.paid));
+                    updateText('yourPendingBalance', getReadableCoins(data.stats.balance));
+
+                    renderPayments(data.payments);
+
+                    $('.yourStats').show();
+
+                    docCookies.setItem('mining_address', address, Infinity);
+
+                    fetchAddressStats(true);
+
+                },
+                error: function (e) {
+                    if (e.statusText === 'abort') return;
+                    $('#lookUp').html(lookupBtnHtml);
+                    $('#addressError').text('Connection error').show();
+
+                    if (addressTimeout) clearTimeout(addressTimeout);
+                    addressTimeout = setTimeout(function () {
+                        fetchAddressStats(false);
+                    }, 2000);
+                }
+            });
+        }
+        fetchAddressStats(false);
+    });
+
+    var address = docCookies.getItem('mining_address');
+
+    if (address) {
+        $('#yourStatsInput').val(address);
+        $('#lookUp').click();
+    }
+
+    $('#yourStatsInput').keyup(function (e) {
+        if (e.keyCode === 13)
+            $('#lookUp').click();
+    });
+
+    var xhrGetPayments;
+    $('#loadMorePayments').click(function () {
+        if (xhrGetPayments) xhrGetPayments.abort();
+        xhrGetPayments = $.ajax({
+            url: api + '/get_payments',
+            data: {
+                time: $('#payments_rows').children().last().data('time'),
+                address: address
+            },
+            dataType: 'json',
+            cache: 'false',
+            success: function (data) {
+                renderPayments(data);
+            }
+        });
+    });
+
+    autoPlayYouTubeModal();
+
+    //FUNCTION TO GET AND AUTO PLAY YOUTUBE VIDEO FROM DATATAG
+    function autoPlayYouTubeModal() {
+        var trigger = $("body").find('[data-toggle="modal"]');
+        trigger.click(function () {
+            var theModal = $(this).data("target"),
+                videoSRC = $(this).attr("data-theVideo"),
+                videoSRCauto = videoSRC + "?autoplay=1";
+            $(theModal + ' iframe').attr('src', videoSRCauto);
+            $(theModal + ' button.close').click(function () {
+                $(theModal + ' iframe').attr('src', videoSRC);
+            });
+        });
+    }
+</script>
